@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
 
-internal object JvmTimeUtils {
+internal object JTimeUtils {
     /**
      * 日期缓存
      */

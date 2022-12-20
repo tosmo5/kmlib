@@ -1,6 +1,6 @@
 package com.tosmo.kmlib.time.time
 
-import com.tosmo.kmlib.time.JvmTimeUtils
+import com.tosmo.kmlib.time.JTimeUtils
 import com.tosmo.kmlib.time.zone.KZone
 import java.time.Instant
 import java.time.LocalTime
@@ -13,7 +13,7 @@ import java.time.LocalTime
 internal actual class KTimeImpl(val localTime: LocalTime) : KTimeBase {
 
     actual constructor(timeString: String, pattern: String) : this(
-        JvmTimeUtils.parseLocalTime(timeString, pattern)
+        JTimeUtils.parseLocalTime(timeString, pattern)
     )
 
     actual constructor(time: Long, zone: KZone) : this(
@@ -25,6 +25,6 @@ internal actual class KTimeImpl(val localTime: LocalTime) : KTimeBase {
     override fun toEpochMilli(zone: KZone): Long = toDateTime().toEpochMilli(zone)
 
     override fun format(pattern: String): String {
-        return JvmTimeUtils.format(localTime, pattern)
+        return JTimeUtils.format(localTime, pattern)
     }
 }
