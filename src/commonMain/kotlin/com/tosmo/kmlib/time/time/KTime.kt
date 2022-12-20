@@ -20,7 +20,7 @@ class KTime internal constructor(internal val impl: KTimeImpl) : KTimeBase by im
     companion object : KTemporalBuilder<KTime> by KTimeBuilderImpl
 
     /**
-     * HH:mm:ss
+     * @see kTimeCustomPattern
      */
-    override fun toString(): String = format(KTemporalPattern.DEFAULT_TIME_PATTERN)
+    override fun toString(): String = format(kTimeCustomPattern)
 }

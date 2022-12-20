@@ -9,7 +9,7 @@ import com.tosmo.kmlib.time.time.KTime
  *
  * @author Thomas Miao
  */
-object KTemporalConfiguration {
+class KTemporalConfiguration {
 
     internal var mDatePattern: String = KTemporalPattern.DEFAULT_DATE_PATTERN
 

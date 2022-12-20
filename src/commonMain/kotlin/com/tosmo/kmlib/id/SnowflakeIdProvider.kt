@@ -4,6 +4,8 @@ import com.tosmo.kmlib.time.KTemporalPattern
 import com.tosmo.kmlib.time.KTimeUtils
 import com.tosmo.kmlib.time.datetime.KDateTime
 import com.tosmo.kmlib.time.zone.KZone
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * 以标准的雪花算法实现的ID分配器
@@ -84,34 +86,35 @@ class SnowflakeIdProvider internal constructor(val timeEpoch: Long, val datacent
         require(!(datacenterId > mMaxDatacenterId || datacenterId < 0)) {
             "datacenter Id can't be greater than $mMaxDatacenterId or less than 0"
         }
+
     }
 
     /**
      * 下一个ID生成算法
      */
-    @Synchronized
-    override fun provide(): Long {
-        var timestamp = mTimeGen()
+    override suspend fun provide(): Long {
+        return Mutex().withLock {
+            var timestamp = mTimeGen()
 
-        //获取当前时间戳如果小于上次时间戳，则表示时间戳获取出现异常
-        require(timestamp >= mLastTimestamp) {
-            "Clock moved backwards. Refusing to generate id for ${mLastTimestamp - timestamp} seconds"
-        }
-
-        //获取当前时间戳如果等于上次时间戳（同一毫秒内），则在序列号加一；否则序列号赋值为0，从0开始。
-        if (mLastTimestamp == timestamp) {
-            mSequence = mSequence + 1 and mSequenceMask
-            if (mSequence == 0L) {
-                timestamp = tilNextMillis(mLastTimestamp)
+            //获取当前时间戳如果小于上次时间戳，则表示时间戳获取出现异常
+            require(timestamp >= mLastTimestamp) {
+                "Clock moved backwards. Refusing to generate id for ${mLastTimestamp - timestamp} seconds"
             }
-        } else {
-            mSequence = 0
+
+            //获取当前时间戳如果等于上次时间戳（同一毫秒内），则在序列号加一；否则序列号赋值为0，从0开始。
+            if (mLastTimestamp == timestamp) {
+                mSequence = mSequence + 1 and mSequenceMask
+                if (mSequence == 0L) {
+                    timestamp = tilNextMillis(mLastTimestamp)
+                }
+            } else {
+                mSequence = 0
+            }
+            //将上次时间戳值刷新
+            mLastTimestamp = timestamp
+
+            ((timestamp - timeEpoch) shl mTimestampLeftShift) or (datacenterId shl mDatacenterIdShift) or (providerId shl mProviderIdShift) or mSequence
         }
-
-        //将上次时间戳值刷新
-        mLastTimestamp = timestamp
-
-        return ((timestamp - timeEpoch) shl mTimestampLeftShift) or (datacenterId shl mDatacenterIdShift) or (providerId shl mProviderIdShift) or mSequence
     }
 
     /**

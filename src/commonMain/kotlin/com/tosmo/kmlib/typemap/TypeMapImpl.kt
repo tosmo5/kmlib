@@ -8,7 +8,6 @@ import com.tosmo.kmlib.typemap.exception.ValueTypeException
 import com.tosmo.kmlib.typemap.privider.ValueRepositoryProvider
 import com.tosmo.kmlib.typemap.repo.IndexRepository
 import com.tosmo.kmlib.typemap.repo.TypeKeyRepository
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  *
@@ -186,8 +185,6 @@ internal class TypeMapImpl<K : TypeKey, N : Index>(
     }
 
     internal fun checkValueType(key: TypeKey, value: TypeValue<*, *>): Boolean {
-        return value.valueValue?.let {
-            key.typeKClass.isSuperclassOf(it::class)
-        } ?: true
+        return key.typeKClass.isInstance(value.valueValue)
     }
 }

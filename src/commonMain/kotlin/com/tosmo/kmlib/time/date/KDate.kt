@@ -20,7 +20,7 @@ open class KDate internal constructor(internal val impl: KDateImpl) : KDateBase 
     companion object : KTemporalBuilder<KDate> by KDateBuilderImpl
 
     /**
-     * yyyy-MM-dd
+     * @see kDateCustomPattern
      */
-    override fun toString(): String = format(KTemporalPattern.DEFAULT_DATE_PATTERN)
+    override fun toString(): String = format(kDateCustomPattern)
 }
